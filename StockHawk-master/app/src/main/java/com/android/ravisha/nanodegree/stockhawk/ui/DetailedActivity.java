@@ -145,7 +145,7 @@ public class DetailedActivity extends Activity {
         LineDataSet dataSet = new LineDataSet(yVals,stockSelected);
         LineData lineData = new LineData(xVals, dataSet);
         lineChart.setData(lineData);
-        lineChart.setDescription("Stock's value over time");
+        lineChart.setDescription(getResources().getString(R.string.stock_description));
         lineChart.setDescriptionTextSize(15f);
         lineChart.getLegend().setTextSize(12f);
         lineChart.setPinchZoom(false);

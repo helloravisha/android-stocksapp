@@ -2,6 +2,7 @@ package com.android.ravisha.nanodegree.stockhawk.ui;
 
 import android.app.AlertDialog;
 import android.app.LoaderManager;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -33,6 +34,7 @@ import com.android.ravisha.nanodegree.stockhawk.rest.RecyclerViewItemClickListen
 import com.android.ravisha.nanodegree.stockhawk.rest.Utils;
 import com.android.ravisha.nanodegree.stockhawk.service.StockIntentService;
 import com.android.ravisha.nanodegree.stockhawk.service.StockTaskService;
+import com.android.ravisha.nanodegree.stockhawk.util.MyQueryHandler;
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.PeriodicTask;
 import com.google.android.gms.gcm.Task;
@@ -127,29 +129,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                 @Override public void onInput(MaterialDialog dialog, CharSequence input) {
                   // On FAB click, receive user input. Make sure the stock doesn't already exist
                   // in the DB and proceed accordingly
-                  Cursor c = getContentResolver().query(QuoteProvider.Quotes.CONTENT_URI,
-                      new String[] { QuoteColumns.SYMBOL }, QuoteColumns.SYMBOL + "= ?",
-                      new String[] { input.toString() }, null);
-                  System.out.println("Cursor count "+c);
-                  if (c.getCount() != 0) {
-                    Toast toast =
-                        Toast.makeText(com.android.ravisha.nanodegree.stockhawk.ui.MyStocksActivity.this, "This stock is already saved!",
-                            Toast.LENGTH_LONG);
-                    toast.setGravity(Gravity.CENTER, Gravity.CENTER, 0);
-                    toast.show();
-                    return;
-                  } else {
-                    // Add the stock to DB
-                    if(!input.toString().trim().isEmpty()) {
-                      mServiceIntent.putExtra("tag", "add");
-                      mServiceIntent.putExtra("symbol", input.toString());
-                      startService(mServiceIntent);
-                    }else{
-                      Toast toast = Toast.makeText(com.android.ravisha.nanodegree.stockhawk.ui.MyStocksActivity.this,"Stock can't be empty",Toast.LENGTH_LONG);
-                      toast.setGravity(Gravity.CENTER,Gravity.CENTER,0);
-                      toast.show();
-                    }
-                  }
+                    addStock(input);
                 }
               })
               .show();
@@ -186,6 +166,44 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     }
   }
 
+    /**
+     * Trying to add the stock asyncronously on a different thread  so that load can be dspatched form the main
+     * thead.
+     * @param input
+     */
+  private void addStock(CharSequence input){
+      MyQueryHandler myQueryHander = new MyQueryHandler(getContentResolver(),this,mServiceIntent,input);
+      myQueryHander.startQuery(1,null,QuoteProvider.Quotes.CONTENT_URI, new String[] { QuoteColumns.SYMBOL },
+             QuoteColumns.SYMBOL + "= ?", new String[] { input.toString().toUpperCase() }, null);
+
+/*
+      Cursor c = getContentResolver().query(QuoteProvider.Quotes.CONTENT_URI,
+              new String[] { QuoteColumns.SYMBOL }, QuoteColumns.SYMBOL + "= ?",
+              new String[] { input.toString().toUpperCase() }, null);
+      if (c.getCount() != 0) {
+          showToasMessage(getResources().getString(R.string.stockAlreadySaved));
+          return;
+      } else {
+          // Add the stock to DB
+          if(!input.toString().trim().isEmpty()) {
+              mServiceIntent.putExtra("tag", "add");
+              mServiceIntent.putExtra("symbol", input.toString().toUpperCase());
+              startService(mServiceIntent);
+          }else{
+              showToasMessage(getResources().getString(R.string.stockEmpty));
+          }
+      } */
+  }
+
+
+  private void showToasMessage(String message){
+      Toast toast =
+              Toast.makeText(com.android.ravisha.nanodegree.stockhawk.ui.MyStocksActivity.this, message,
+                      Toast.LENGTH_LONG);
+      toast.setGravity(Gravity.CENTER, Gravity.CENTER, 0);
+      toast.show();
+  }
+
 
   @Override
   public void onResume() {
@@ -212,11 +230,11 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   }
 
   private void alertUserForNoConnectivity(){
-      String message = "OopS No Internet.";
+
       new AlertDialog.Builder(MyStocksActivity.this)
-              .setTitle("Alert")
-              .setMessage(message)
-              .setPositiveButton("ok", null)
+              .setTitle(getResources().getString(R.string.alert))
+              .setMessage(getResources().getString(R.string.no_internet))
+              .setPositiveButton(getResources().getString(R.string.okButton), null)
               .show();
   }
 

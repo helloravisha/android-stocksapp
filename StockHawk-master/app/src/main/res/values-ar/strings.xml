@@ -11,4 +11,10 @@
   <string name="input_prefill"></string>
   <string name="network_toast">Uh-oh! This app requires an internet connection</string>
   <string name="no_connectivity">No Connectivity</string>
+  <string name="no_internet">OopS No Internet.</string>
+  <string name="description">Stock\'s value over time</string>
+  <string name="alert">Alert</string>
+  <string name="okButton">ok</string>
+  <string name="stockAlreadySaved">This stock is already saved!</string>
+  <string name="stockEmpty">Stock can\'t be empty</string>
 </resources>

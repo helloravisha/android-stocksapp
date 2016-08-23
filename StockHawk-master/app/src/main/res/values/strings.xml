@@ -16,4 +16,10 @@
   <string name="widget_img_launcher">Widget Image Launcher</string>
   <string name="widget_header">ravisha</string>
   <string name="no_connectivity">No Connectivity</string>
+  <string name="no_internet">OopS No Internet.</string>
+  <string name="stock_description">Stocks value over time</string>
+  <string name="alert">Alert</string>
+  <string name="okButton">ok</string>
+  <string name="stockAlreadySaved">This stock is already saved!</string>
+  <string name="stockEmpty">Stock can\'t be empty</string>
 </resources>
